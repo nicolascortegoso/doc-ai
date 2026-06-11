@@ -1,0 +1,9 @@
+services:
+
+  app:
+    build:
+      target: dev
+    volumes:
+      - .:/app
+    stdin_open: true
+    tty: true

@@ -1,0 +1,7 @@
+services:
+
+  app:
+    build:
+      context: .
+    environment:
+      - PYTHONPATH=/app
