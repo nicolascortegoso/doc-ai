@@ -1,8 +1,8 @@
 from .base import BaseDocumentProfiler
 from .detector import MimeTypeDetector
-from .enums import FileType, Layout
+from ..common.enums import FileType, Layout
 from .implementations.default import DefaultProfiler
-from .models import DocumentProfile, PageProfile
+from ..common.models import DocumentProfile, PageProfile
 from .registry import NoProfilerFoundError, ProfilerPriorityConflictError, ProfilerRegistry
 
 __all__ = [

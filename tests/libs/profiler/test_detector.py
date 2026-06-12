@@ -4,7 +4,7 @@ import zlib
 import pytest
 
 from libs.profiler.detector import MimeTypeDetector
-from libs.profiler.enums import FileType
+from libs.common.enums import FileType
 
 
 class TestMimeTypeDetector:

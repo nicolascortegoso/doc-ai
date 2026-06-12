@@ -1,6 +1,6 @@
 import magic
 
-from libs.profiler.enums import FileType
+from libs.common.enums import FileType
 
 
 class MimeTypeDetector:

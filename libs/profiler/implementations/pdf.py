@@ -4,8 +4,8 @@ import fitz  # PyMuPDF
 
 from libs.language.base import LanguageDetector
 from libs.profiler.base import BaseDocumentProfiler
-from libs.profiler.enums import FileType, Layout
-from libs.profiler.models import DocumentProfile, PageProfile
+from libs.common.enums import FileType, Layout
+from libs.common.models import DocumentProfile, PageProfile
 
 
 class PdfProfiler(BaseDocumentProfiler):

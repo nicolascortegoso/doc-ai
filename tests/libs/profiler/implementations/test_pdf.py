@@ -8,7 +8,7 @@ import pytest
 
 from libs.language.base import LanguageDetector
 from libs.language.implementations.dummy import DummyLanguageDetector
-from libs.profiler.enums import FileType, Layout
+from libs.common.enums import FileType, Layout
 from libs.profiler.implementations.pdf import PdfProfiler
 
 

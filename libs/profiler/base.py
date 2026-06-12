@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import ClassVar
 
-from libs.profiler.enums import FileType
-from libs.profiler.models import DocumentProfile
+from libs.common.enums import FileType
+from libs.common.models import DocumentProfile
 
 
 class BaseDocumentProfiler(ABC):

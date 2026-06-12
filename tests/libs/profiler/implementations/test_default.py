@@ -1,6 +1,6 @@
 import pytest
 
-from libs.profiler.enums import FileType
+from libs.common.enums import FileType
 from libs.profiler.implementations.default import DefaultProfiler
 
 
