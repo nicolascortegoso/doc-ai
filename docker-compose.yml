@@ -1,7 +1,18 @@
 services:
-
-  app:
+  dev:
     build:
       context: .
+      target: dev
+    volumes:
+      - .:/app
     environment:
-      - PYTHONPATH=/app
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
+
+  ci:
+    build:
+      context: .
+      target: ci
+    environment:
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1

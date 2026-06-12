@@ -1,8 +1,7 @@
 .DEFAULT_GOAL := help
 
-COMPOSE      := docker compose
-SERVICE_DEV  := dev
-SERVICE_CI   := ci
+COMPOSE_DEV  := docker compose -f docker-compose.yml -f docker-compose.dev.yml
+COMPOSE_CI   := docker compose -f docker-compose.yml -f docker-compose.ci.yml
 
 # ── help ──────────────────────────────────────────────────────────────────────
 
@@ -15,29 +14,30 @@ help:
 
 .PHONY: build
 build: ## Build the dev image
-	$(COMPOSE) build $(SERVICE_DEV)
+	$(COMPOSE_DEV) build app
 
 .PHONY: build-ci
 build-ci: ## Build the CI image
-	$(COMPOSE) build $(SERVICE_CI)
+	$(COMPOSE_CI) build app
 
 .PHONY: build-all
 build-all: ## Build all images
-	$(COMPOSE) build
+	$(COMPOSE_DEV) build app
+	$(COMPOSE_CI) build app
 
 # ── test ──────────────────────────────────────────────────────────────────────
 
 .PHONY: test
 test: ## Run tests inside the CI container
-	$(COMPOSE) run --rm $(SERVICE_CI)
+	$(COMPOSE_CI) run --rm app
 
 .PHONY: test-local
 test-local: ## Run tests locally on the host
-	python -m pytest tests/ -v --cov=libs/parsing --cov-report=term-missing
+	python -m pytest tests/ -v --cov=libs --cov-report=term-missing
 
 .PHONY: test-xml
 test-xml: ## Run tests locally and emit coverage.xml
-	python -m pytest tests/ -v --cov=libs/parsing --cov-report=xml
+	python -m pytest tests/ -v --cov=libs --cov-report=xml
 
 # ── lint / format ─────────────────────────────────────────────────────────────
 
@@ -61,7 +61,7 @@ format-check: ## Check formatting without modifying files
 
 .PHONY: shell
 shell: ## Drop into a shell inside the dev container
-	$(COMPOSE) run --rm $(SERVICE_DEV) bash
+	$(COMPOSE_DEV) run --rm app bash
 
 # ── install ───────────────────────────────────────────────────────────────────
 
@@ -82,5 +82,6 @@ clean: ## Remove Python cache files and coverage artefacts
 
 .PHONY: clean-docker
 clean-docker: ## Remove stopped containers and dangling images
-	$(COMPOSE) down --remove-orphans
+	$(COMPOSE_DEV) down --remove-orphans
+	$(COMPOSE_CI) down --remove-orphans
 	docker image prune -f
