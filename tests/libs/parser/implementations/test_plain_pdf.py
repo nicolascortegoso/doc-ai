@@ -9,8 +9,8 @@ import pytest
 from libs.common.enums import FileType, Layout
 from libs.common.models import PageProfile
 from libs.parser.implementations.plain_pdf import PlainPdfExtractionStrategy
-from libs.text.base import TextCleaner
-from libs.text.implementations.passthrough import PassthroughTextCleaner
+from libs.postprocessor.base import Postprocessor
+from libs.postprocessor.implementations.passthrough import PassthroughPostprocessor
 
 
 def _make_page_profile(
@@ -103,23 +103,23 @@ class TestPlainPdfStrategyExtract:
         assert "Page three" not in result_p1
 
 
-class TestPlainPdfStrategyTextCleaner:
-    def test_uses_passthrough_cleaner_by_default(self, single_page_pdf):
+class TestPlainPdfStrategyPostprocessor:
+    def test_uses_passthrough_postprocessor_by_default(self, single_page_pdf):
         strategy = PlainPdfExtractionStrategy()
         result = strategy.extract(single_page_pdf, _make_page_profile(1))
         assert isinstance(result, str)
 
-    def test_clean_called_with_extracted_text(self, single_page_pdf):
-        mock_cleaner = MagicMock(spec=TextCleaner)
-        mock_cleaner.clean.return_value = "cleaned text"
-        strategy = PlainPdfExtractionStrategy(text_cleaner=mock_cleaner)
+    def test_process_called_with_extracted_text(self, single_page_pdf):
+        mock_postprocessor = MagicMock(spec=Postprocessor)
+        mock_postprocessor.process.return_value = "processed text"
+        strategy = PlainPdfExtractionStrategy(postprocessor=mock_postprocessor)
         result = strategy.extract(single_page_pdf, _make_page_profile(1))
-        mock_cleaner.clean.assert_called_once()
-        assert result == "cleaned text"
+        mock_postprocessor.process.assert_called_once()
+        assert result == "processed text"
 
-    def test_custom_cleaner_output_is_returned(self, single_page_pdf):
-        mock_cleaner = MagicMock(spec=TextCleaner)
-        mock_cleaner.clean.return_value = "## Transformed"
-        strategy = PlainPdfExtractionStrategy(text_cleaner=mock_cleaner)
+    def test_custom_postprocessor_output_is_returned(self, single_page_pdf):
+        mock_postprocessor = MagicMock(spec=Postprocessor)
+        mock_postprocessor.process.return_value = "## Transformed"
+        strategy = PlainPdfExtractionStrategy(postprocessor=mock_postprocessor)
         result = strategy.extract(single_page_pdf, _make_page_profile(1))
         assert result == "## Transformed"

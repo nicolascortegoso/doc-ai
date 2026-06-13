@@ -12,7 +12,7 @@ def _make_parsed_page(page_number: int, content: str = "") -> ParsedPage:
     )
 
 
-class TestMarkdownDocument:
+class TestParsedDocument:
     def test_to_markdown_single_page_with_content(self):
         doc = ParsedDocument(
             mime_type=FileType.PDF,

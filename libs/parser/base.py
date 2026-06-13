@@ -42,8 +42,8 @@ class BasePageExtractionStrategy(ABC):
 
     @abstractmethod
     def extract(self, file_bytes: bytes, page_profile: PageProfile) -> str:
-        """Extract Markdown content from the given page.
+        """Extract text content from the given page.
 
-        Returns raw Markdown string for the page. May return an empty
+        Returns the extracted text for the page. May return an empty
         string if no content can be extracted.
         """

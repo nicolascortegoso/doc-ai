@@ -91,12 +91,12 @@ class TestParserRegistryStartupValidation:
 
 
 class TestParserRegistryDispatch:
-    def test_returns_markdown_document_with_correct_mime(self):
+    def test_returns_parsed_document_with_correct_mime(self):
         registry = ParserRegistry(strategies=[DefaultPageExtractionStrategy()])
         result = registry.parse(b"", _make_profile())
         assert result.mime_type == FileType.PDF
 
-    def test_returns_markdown_document_with_correct_page_count(self):
+    def test_returns_parsed_document_with_correct_page_count(self):
         registry = ParserRegistry(strategies=[DefaultPageExtractionStrategy()])
         result = registry.parse(b"", _make_profile())
         assert result.page_count == 1
