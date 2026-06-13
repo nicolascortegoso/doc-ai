@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class TextSplitter(ABC):
+class Splitter(ABC):
     @abstractmethod
     def find_split(self, text: str, position: int) -> int:
         """Given a desired split position, return the actual position to cut at.

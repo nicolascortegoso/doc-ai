@@ -1,7 +1,7 @@
-from libs.splitter.base import TextSplitter
+from libs.splitter.base import Splitter
 
 
-class CharacterTextSplitter(TextSplitter):
+class CharacterSplitter(Splitter):
     """Returns the position unchanged — cuts at the exact character boundary.
 
     Used as the default when no real splitter is configured.

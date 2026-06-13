@@ -5,8 +5,8 @@ from typing import ClassVar
 from libs.common.enums import FileType
 from libs.common.models import DocumentChunk, ParsedDocument, SourceReference
 from libs.chunker.base import BaseChunkingStrategy
-from libs.splitter.base import TextSplitter
-from libs.splitter.implementations.character import CharacterTextSplitter
+from libs.splitter.base import Splitter
+from libs.splitter.implementations.character import CharacterSplitter
 
 
 class SlidingWindowChunkingStrategy(BaseChunkingStrategy):
@@ -16,14 +16,14 @@ class SlidingWindowChunkingStrategy(BaseChunkingStrategy):
     positions, then slides a window over the concatenated text. Each chunk
     records the pages it spans via SourceReference.
 
-    A TextSplitter is injected at construction time to control where windows
-    are cut. Defaults to CharacterTextSplitter (exact character boundary).
+    A Splitter is injected at construction time to control where windows
+    are cut. Defaults to CharacterSplitter (exact character boundary).
 
     Args:
         window_size: Number of characters per chunk. Default: 1000.
         overlap_ratio: Fraction of window_size to overlap between consecutive
             chunks. Must be in [0, 1). Default: 0.2.
-        text_splitter: Injected TextSplitter. Default: CharacterTextSplitter.
+        splitter: Injected Splitter. Default: CharacterSplitter.
     """
 
     supported_mime_types: ClassVar[list[FileType]] = list(FileType)
@@ -32,7 +32,7 @@ class SlidingWindowChunkingStrategy(BaseChunkingStrategy):
         self,
         window_size: int = 1000,
         overlap_ratio: float = 0.2,
-        text_splitter: TextSplitter = None,
+        splitter: Splitter = None,
     ) -> None:
         if not (0 <= overlap_ratio < 1):
             raise ValueError(f"overlap_ratio must be in [0, 1), got {overlap_ratio}")
@@ -40,7 +40,7 @@ class SlidingWindowChunkingStrategy(BaseChunkingStrategy):
             raise ValueError(f"window_size must be >= 1, got {window_size}")
         self._window_size = window_size
         self._overlap_ratio = overlap_ratio
-        self._text_splitter = text_splitter or CharacterTextSplitter()
+        self._splitter = splitter or CharacterSplitter()
 
     def can_handle(self, document: ParsedDocument) -> bool:
         return True
@@ -60,7 +60,7 @@ class SlidingWindowChunkingStrategy(BaseChunkingStrategy):
 
         while pos < len(text):
             proposed_end = min(pos + self._window_size, len(text))
-            actual_end = self._text_splitter.find_split(text, proposed_end)
+            actual_end = self._splitter.find_split(text, proposed_end)
             actual_end = max(pos + 1, min(actual_end, len(text)))
 
             window = text[pos:actual_end]

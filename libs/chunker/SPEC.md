@@ -2,18 +2,14 @@
 
 ## Overview
 
-A standalone, extensible document chunking library living at `libs/chunker/` inside the
-Document-AI project. Accepts a `ParsedDocument` (produced by the parser) and produces a
-list of `DocumentChunk` dataclasses. Designed around an ABC and a priority-based registry
-so that format-specific chunking strategies can be added incrementally without modifying
-the core module.
+Accepts a `ParsedDocument` and produces a list of `DocumentChunk` dataclasses. Designed
+around an ABC and a priority-based registry so that format-specific chunking strategies
+can be added incrementally without modifying the core module.
 
 `SlidingWindowChunkingStrategy` ships as the only concrete implementation and serves as
-the default last resort.
-
-The chunker operates directly on `ParsedDocument.pages` — it does not serialise the
-document to a string. Each `ParsedPage` carries `page_number` and `content`, giving the
-chunker everything it needs to produce self-contained `DocumentChunk` objects with accurate
+the default last resort. It operates directly on `ParsedDocument.pages` — no serialisation
+involved. Each `ParsedPage` carries `page_number` and `content`, giving the chunker
+everything it needs to produce self-contained `DocumentChunk` objects with accurate
 `SourceReference` values.
 
 ---
@@ -27,7 +23,7 @@ chunker everything it needs to produce self-contained `DocumentChunk` objects wi
 
 ## Data Models
 
-Defined in `libs/common/models.py` alongside `DocumentProfile`, `ParsedDocument`, and `ParsedPage`.
+Defined in `libs/common/models.py`.
 
 ### `SourceReference` Dataclass
 
@@ -51,27 +47,19 @@ A self-contained fragment of a document.
 
 ---
 
-## Text Splitting
+## Split-Point Determination
 
-Text splitting is injected as a dependency — strategies do not hardcode any split-point
-logic.
+Split-point determination is injected as a dependency — strategies do not hardcode any
+splitting logic.
 
-### `TextSplitter` ABC
-
-Defined in `libs/splitter/base.py`.
+The `Splitter` ABC provides:
 
 | Method | Signature | Description |
 |---|---|---|
 | `find_split` | `(text: str, position: int) -> int` | Given a desired split position, returns the actual position to cut at. Never raises. |
 
-### `CharacterTextSplitter`
-
-Defined in `libs/splitter/implementations/character.py`. Returns `position` unchanged —
-cuts at the exact character boundary. Used as the default when no real splitter is
-configured.
-
-Future implementations (e.g. `SentenceTextSplitter`, `ParagraphTextSplitter`) are added
-under `libs/splitter/implementations/` without modifying any other code.
+The `Splitter` is injected at strategy construction time by the consuming project.
+`CharacterSplitter` is used as the default when no splitter is configured.
 
 ---
 
@@ -92,13 +80,7 @@ every subclass must explicitly declare all of the following:
 ## Chunker Registry
 
 A `ChunkerRegistry` is instantiated by the consuming project and receives its strategy list
-directly as a constructor argument:
-
-```python
-registry = ChunkerRegistry(strategies=[
-    SlidingWindowChunkingStrategy(window_size=1000, overlap_ratio=0.2),
-])
-```
+directly as a constructor argument.
 
 **At startup**, the registry validates that no two registered strategies share the same
 `get_priority()` for the same `FileType` — raises `ChunkerPriorityConflictError`, failing
@@ -121,9 +103,8 @@ operation this should never occur — it indicates a misconfiguration where
 ## `SlidingWindowChunkingStrategy`
 
 The default and only concrete chunking strategy shipped with the module. Handles all
-`FileType` values. Implements a sliding window directly over `ParsedDocument.pages` —
-no serialisation or delimiter parsing involved. Accepts a `TextSplitter` injected at
-construction time to control where windows are cut.
+`FileType` values. Implements a sliding window directly over `ParsedDocument.pages`.
+Accepts a `Splitter` injected at construction time to control where windows are cut.
 
 | Attribute | Value |
 |---|---|
@@ -132,7 +113,7 @@ construction time to control where windows are cut.
 | `can_handle` | Always `True` |
 | Default `window_size` | `1000` characters |
 | Default `overlap_ratio` | `0.2` |
-| Default `TextSplitter` | `CharacterTextSplitter` |
+| Default `Splitter` | `CharacterSplitter` |
 
 ### Algorithm
 
@@ -141,7 +122,7 @@ construction time to control where windows are cut.
    begins in the concatenated text
 2. Slide a window of `window_size` characters over the concatenated text, advancing by
    `window_size * (1 - overlap_ratio)` characters each step
-3. For each proposed window end position, call `text_splitter.find_split(text, end)` to
+3. For each proposed window end position, call `splitter.find_split(text, end)` to
    determine the actual cut point
 4. Resolve `page_start` and `page_end` from the page map using the window's start and
    actual end positions
@@ -174,7 +155,7 @@ characters of each chunk are repeated at the start of the next.
 | Python | 3.12 |
 | Chunking unit | Characters |
 | Overlap | Ratio of `window_size` |
-| Split point | Injected via `TextSplitter` ABC — `CharacterTextSplitter` by default |
+| Split point | Injected via `Splitter` ABC |
 | Testing | `pytest` + `pytest-cov` |
 | Linting / formatting | `ruff` |
 
@@ -183,43 +164,28 @@ characters of each chunk are repeated at the start of the next.
 ## Folder Structure
 
 ```
-document-ai/
-├── libs/
-│   ├── common/
-│   │   ├── __init__.py
-│   │   ├── enums.py                          # FileType, Layout
-│   │   └── models.py                         # PageProfile, DocumentProfile, ParsedPage,
-│   │                                         # ParsedDocument, SourceReference, DocumentChunk
-│   ├── splitter/
-│   │   ├── __init__.py
-│   │   ├── base.py                           # TextSplitter ABC
-│   │   └── implementations/
-│   │       ├── __init__.py
-│   │       └── character.py                  # CharacterTextSplitter
-│   └── chunker/
-│       ├── __init__.py
-│       ├── base.py                           # BaseChunkingStrategy ABC
-│       ├── registry.py                       # ChunkerRegistry, errors
-│       └── implementations/
-│           ├── __init__.py
-│           └── sliding_window.py             # SlidingWindowChunkingStrategy
-└── tests/
-    └── libs/
-        ├── splitter/
-        │   └── implementations/
-        │       └── test_character.py
-        └── chunker/
-            ├── test_registry.py
-            └── implementations/
-                └── test_sliding_window.py
+libs/
+└── chunker/
+    ├── __init__.py
+    ├── base.py                           # BaseChunkingStrategy ABC
+    ├── registry.py                       # ChunkerRegistry, errors
+    └── implementations/
+        ├── __init__.py
+        └── sliding_window.py             # SlidingWindowChunkingStrategy
+tests/
+└── libs/
+    └── chunker/
+        ├── test_registry.py
+        └── implementations/
+            └── test_sliding_window.py
 ```
 
 ---
 
 ## Implementation Order
 
-1. `SourceReference` + `DocumentChunk` (added to `libs/common/models.py`)
-2. `TextSplitter` ABC + `CharacterTextSplitter`
+1. `SourceReference` + `DocumentChunk` (in `libs/common/models.py`)
+2. `Splitter` ABC + `CharacterSplitter`
 3. `BaseChunkingStrategy` ABC
 4. `ChunkerRegistry` + errors
 5. `SlidingWindowChunkingStrategy`
@@ -231,8 +197,6 @@ document-ai/
 
 - [ ] `SourceReference` dataclass defined with: `page_start`, `page_end`
 - [ ] `DocumentChunk` dataclass defined with: `content`, `source_reference`, `mime_type`, `strategy`
-- [ ] `TextSplitter` ABC defined with single abstract method `find_split(text: str, position: int) -> int`
-- [ ] `CharacterTextSplitter` returns `position` unchanged, never raises
 - [ ] `BaseChunkingStrategy` ABC defined with no defaults: `supported_mime_types`, `can_handle`, `get_priority`, `chunk` all abstract
 - [ ] `get_priority` contract documented: valid range is 1–100, higher value wins
 - [ ] `ChunkerRegistry` accepts strategy list as constructor argument, runs conflict detection at startup
@@ -243,15 +207,15 @@ document-ai/
 - [ ] `SlidingWindowChunkingStrategy` `get_priority` always returns `1`
 - [ ] `SlidingWindowChunkingStrategy` default `window_size` is `1000`
 - [ ] `SlidingWindowChunkingStrategy` default `overlap_ratio` is `0.2`
-- [ ] `SlidingWindowChunkingStrategy` default `TextSplitter` is `CharacterTextSplitter`
-- [ ] `SlidingWindowChunkingStrategy` operates directly on `ParsedDocument.pages` — no serialisation or delimiter parsing
+- [ ] `SlidingWindowChunkingStrategy` default `Splitter` is `CharacterSplitter`
+- [ ] `SlidingWindowChunkingStrategy` operates directly on `ParsedDocument.pages`
 - [ ] `SlidingWindowChunkingStrategy` builds a page map from concatenated page content
-- [ ] `SlidingWindowChunkingStrategy` calls `text_splitter.find_split` to determine actual cut point per window
+- [ ] `SlidingWindowChunkingStrategy` calls `splitter.find_split` to determine actual cut point per window
 - [ ] `SlidingWindowChunkingStrategy` correctly resolves `page_start` and `page_end` for chunks within a single page
 - [ ] `SlidingWindowChunkingStrategy` correctly resolves `page_start` and `page_end` for chunks spanning multiple pages
 - [ ] `SlidingWindowChunkingStrategy` advances window by `window_size * (1 - overlap_ratio)` characters per step
 - [ ] `SlidingWindowChunkingStrategy` produces a single chunk for documents shorter than `window_size`
 - [ ] `SlidingWindowChunkingStrategy` produces an empty list for documents with no content
 - [ ] `SlidingWindowChunkingStrategy` records its class name on each `DocumentChunk.strategy`
-- [ ] Text splitter injected at strategy construction time by the consuming project
+- [ ] Splitter injected at strategy construction time by the consuming project
 - [ ] Unit tests cover: registry conflict detection, priority resolution, `can_handle` dispatch, `NoChunkingStrategyFoundError`, sliding window correctness, overlap, page map resolution, `find_split` called per window, edge cases

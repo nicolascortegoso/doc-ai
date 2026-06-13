@@ -1,9 +1,9 @@
-from libs.splitter.implementations.character import CharacterTextSplitter
+from libs.splitter.implementations.character import CharacterSplitter
 
 
-class TestCharacterTextSplitter:
+class TestCharacterSplitter:
     def setup_method(self):
-        self.splitter = CharacterTextSplitter()
+        self.splitter = CharacterSplitter()
 
     def test_returns_position_unchanged(self):
         assert self.splitter.find_split("hello world", 5) == 5

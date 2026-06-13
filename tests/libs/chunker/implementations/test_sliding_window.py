@@ -7,8 +7,8 @@ import pytest
 from libs.common.enums import FileType
 from libs.common.models import ParsedDocument, ParsedPage
 from libs.chunker.implementations.sliding_window import SlidingWindowChunkingStrategy
-from libs.splitter.base import TextSplitter
-from libs.splitter.implementations.character import CharacterTextSplitter
+from libs.splitter.base import Splitter
+from libs.splitter.implementations.character import CharacterSplitter
 
 
 def _make_document(
@@ -53,7 +53,7 @@ class TestSlidingWindowConstruction:
 
     def test_default_splitter_is_character(self):
         strategy = SlidingWindowChunkingStrategy()
-        assert isinstance(strategy._text_splitter, CharacterTextSplitter)
+        assert isinstance(strategy._splitter, CharacterSplitter)
 
     def test_raises_on_overlap_ratio_of_1(self):
         with pytest.raises(ValueError):
@@ -68,9 +68,9 @@ class TestSlidingWindowConstruction:
             SlidingWindowChunkingStrategy(window_size=0)
 
     def test_custom_splitter_is_used(self):
-        mock_splitter = MagicMock(spec=TextSplitter)
-        strategy = SlidingWindowChunkingStrategy(text_splitter=mock_splitter)
-        assert strategy._text_splitter is mock_splitter
+        mock_splitter = MagicMock(spec=Splitter)
+        strategy = SlidingWindowChunkingStrategy(splitter=mock_splitter)
+        assert strategy._splitter is mock_splitter
 
 
 class TestSlidingWindowEdgeCases:
@@ -135,27 +135,27 @@ class TestSlidingWindowChunking:
             assert chunk.mime_type == FileType.PDF
 
 
-class TestSlidingWindowTextSplitter:
+class TestSlidingWindowSplitter:
     def test_find_split_called_per_window(self):
-        mock_splitter = MagicMock(spec=TextSplitter)
+        mock_splitter = MagicMock(spec=Splitter)
         mock_splitter.find_split.side_effect = lambda text, pos: pos
         strategy = SlidingWindowChunkingStrategy(
             window_size=10,
             overlap_ratio=0.0,
-            text_splitter=mock_splitter,
+            splitter=mock_splitter,
         )
         strategy.chunk(_make_single_page("a" * 50))
         assert mock_splitter.find_split.call_count >= 1
 
     def test_custom_splitter_adjusts_cut_point(self):
-        class ShortSplitter(TextSplitter):
+        class ShortSplitter(Splitter):
             def find_split(self, text: str, position: int) -> int:
                 return max(0, position - 2)
 
         strategy = SlidingWindowChunkingStrategy(
             window_size=10,
             overlap_ratio=0.0,
-            text_splitter=ShortSplitter(),
+            splitter=ShortSplitter(),
         )
         result = strategy.chunk(_make_single_page("a" * 50))
         for chunk in result:
