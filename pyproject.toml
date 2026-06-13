@@ -20,7 +20,7 @@ dev = [
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["libs*"]
+include = ["libs*", "backends*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -34,5 +34,5 @@ line-length = 100
 select = ["E", "F", "I", "UP"]
 
 [tool.coverage.run]
-source = ["libs"]
+source = ["libs", "backends"]
 omit = ["tests/*"]
