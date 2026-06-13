@@ -1,7 +1,8 @@
-from libs.profiler.base import BaseDocumentProfiler
-from libs.profiler.detector import MimeTypeDetector
 from libs.common.enums import FileType
 from libs.common.models import DocumentProfile
+from libs.detector.base import Detector
+from libs.detector.implementations.default import DefaultDetector
+from libs.profiler.base import BaseDocumentProfiler
 
 
 class ProfilerPriorityConflictError(Exception):
@@ -21,23 +22,27 @@ class NoProfilerFoundError(Exception):
 class ProfilerRegistry:
     """Dispatches raw file bytes to the highest-priority matching profiler.
 
-    Accepts a list of profilers as a constructor argument. Language detector
-    wiring is handled by the consuming project at profiler construction time.
+    Accepts a list of profilers and a Detector as constructor arguments.
+    Detector wiring is handled by the consuming project.
 
     Startup validation:
         Raises ProfilerPriorityConflictError if any two profilers share the
         same get_priority() value for the same FileType.
 
     Dispatch flow:
-        1. Detect MIME via MimeTypeDetector → FileType
+        1. Detect MIME via detector.detect_mime(file_bytes) → FileType
         2. Filter candidates to those whose supported_mime_types includes the FileType
         3. Call can_handle on each candidate
         4. Sort surviving candidates by get_priority() descending, dispatch to winner
     """
 
-    def __init__(self, profilers: list[BaseDocumentProfiler]) -> None:
+    def __init__(
+        self,
+        profilers: list[BaseDocumentProfiler],
+        detector: Detector = None,
+    ) -> None:
         self._profilers = profilers
-        self._detector = MimeTypeDetector()
+        self._detector = detector or DefaultDetector()
         self._validate_priorities()
 
     def _validate_priorities(self) -> None:
@@ -55,7 +60,7 @@ class ProfilerRegistry:
                 seen[key] = type(profiler)
 
     def profile(self, file_bytes: bytes) -> DocumentProfile:
-        mime_type = self._detector.detect(file_bytes)
+        mime_type = self._detector.detect_mime(file_bytes)
 
         candidates = [
             p for p in self._profilers

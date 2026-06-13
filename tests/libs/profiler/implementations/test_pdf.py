@@ -6,9 +6,9 @@ from unittest.mock import MagicMock
 import fitz
 import pytest
 
-from libs.language.base import LanguageDetector
-from libs.language.implementations.dummy import DummyLanguageDetector
 from libs.common.enums import FileType, Layout
+from libs.detector.base import Detector
+from libs.detector.implementations.default import DefaultDetector
 from libs.profiler.implementations.pdf import PdfProfiler
 
 
@@ -51,10 +51,8 @@ def _make_encrypted_pdf() -> bytes:
 
 def _make_multipage_pdf() -> bytes:
     doc = fitz.open()
-    # Page 1: text
     p1 = doc.new_page()
     p1.insert_text((50, 50), "Page one text content.")
-    # Page 2: image only
     p2 = doc.new_page()
     pix = fitz.Pixmap(fitz.csRGB, fitz.IRect(0, 0, 10, 10))
     pix.set_rect(fitz.IRect(0, 0, 10, 10), (0, 255, 0))
@@ -67,7 +65,7 @@ def _make_multipage_pdf() -> bytes:
 
 @pytest.fixture
 def profiler() -> PdfProfiler:
-    return PdfProfiler(language_detector=DummyLanguageDetector())
+    return PdfProfiler(detector=DefaultDetector())
 
 
 # ---------------------------------------------------------------------------
@@ -173,26 +171,26 @@ class TestPdfProfilerScannedPage:
 
 
 # ---------------------------------------------------------------------------
-# language detector interaction
+# Detector interaction
 # ---------------------------------------------------------------------------
 
-class TestPdfProfilerLanguageDetector:
-    def test_detect_called_with_page_text(self):
-        mock_detector = MagicMock(spec=LanguageDetector)
-        mock_detector.detect.return_value = "fr"
-        profiler = PdfProfiler(language_detector=mock_detector)
+class TestPdfProfilerDetector:
+    def test_detect_language_called_with_page_text(self):
+        mock_detector = MagicMock(spec=Detector)
+        mock_detector.detect_language.return_value = "fr"
+        profiler = PdfProfiler(detector=mock_detector)
 
         result = profiler.profile(_make_text_pdf("Bonjour le monde"))
 
-        mock_detector.detect.assert_called_once()
-        call_arg = mock_detector.detect.call_args[0][0]
+        mock_detector.detect_language.assert_called_once()
+        call_arg = mock_detector.detect_language.call_args[0][0]
         assert "Bonjour" in call_arg
         assert result.pages[0].language == "fr"
 
-    def test_detect_not_called_for_image_only_page(self):
-        mock_detector = MagicMock(spec=LanguageDetector)
-        profiler = PdfProfiler(language_detector=mock_detector)
+    def test_detect_language_not_called_for_image_only_page(self):
+        mock_detector = MagicMock(spec=Detector)
+        profiler = PdfProfiler(detector=mock_detector)
 
         profiler.profile(_make_image_pdf())
 
-        mock_detector.detect.assert_not_called()
+        mock_detector.detect_language.assert_not_called()

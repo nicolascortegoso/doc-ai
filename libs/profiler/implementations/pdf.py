@@ -2,10 +2,11 @@ from typing import ClassVar
 
 import fitz  # PyMuPDF
 
-from libs.language.base import LanguageDetector
-from libs.profiler.base import BaseDocumentProfiler
 from libs.common.enums import FileType, Layout
 from libs.common.models import DocumentProfile, PageProfile
+from libs.detector.base import Detector
+from libs.detector.implementations.default import DefaultDetector
+from libs.profiler.base import BaseDocumentProfiler
 
 
 class PdfProfiler(BaseDocumentProfiler):
@@ -14,13 +15,13 @@ class PdfProfiler(BaseDocumentProfiler):
     Detects per-page structural metadata: text, images, tables, scanned pages,
     column layout, and language.
 
-    Requires a LanguageDetector injected at construction time.
+    Requires a Detector injected at construction time.
     """
 
     supported_mime_types: ClassVar[list[FileType]] = [FileType.PDF]
 
-    def __init__(self, language_detector: LanguageDetector) -> None:
-        self._language_detector = language_detector
+    def __init__(self, detector: Detector = None) -> None:
+        self._detector = detector or DefaultDetector()
 
     def can_handle(self, file_bytes: bytes) -> bool:
         """Returns False for encrypted PDFs, True otherwise."""
@@ -55,7 +56,7 @@ class PdfProfiler(BaseDocumentProfiler):
         is_scanned = not has_text and has_images
 
         layout = Layout.SINGLE_COLUMN if has_text else Layout.UNKNOWN
-        language = self._language_detector.detect(text) if has_text else None
+        language = self._detector.detect_language(text) if has_text else None
 
         return PageProfile(
             page_number=page.number + 1,

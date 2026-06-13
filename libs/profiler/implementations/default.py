@@ -1,8 +1,8 @@
 from typing import ClassVar
 
-from libs.profiler.base import BaseDocumentProfiler
 from libs.common.enums import FileType
 from libs.common.models import DocumentProfile
+from libs.profiler.base import BaseDocumentProfiler
 
 
 class DefaultProfiler(BaseDocumentProfiler):
@@ -13,7 +13,7 @@ class DefaultProfiler(BaseDocumentProfiler):
     returns True from can_handle, and always declares priority 1 — ensuring
     it is the last resort when no higher-priority profiler matches.
 
-    Does not require a LanguageDetector — no text is extracted.
+    Does not require a Detector — no text or MIME detection is performed.
     """
 
     supported_mime_types: ClassVar[list[FileType]] = list(FileType)

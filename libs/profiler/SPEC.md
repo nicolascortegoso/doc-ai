@@ -2,13 +2,11 @@
 
 ## Overview
 
-A standalone, extensible document profiling library living at `libs/profiler/` inside the
-Document-AI project. Accepts raw file bytes and produces a structured `DocumentProfile`
-dataclass. Designed around an ABC and a priority-based registry so that format-specific
-profilers can be added incrementally without modifying the core module.
+Accepts raw file bytes and produces a structured `DocumentProfile` dataclass. Designed
+around an ABC and a priority-based registry so that format-specific profilers can be added
+incrementally without modifying the core module.
 
-The `DefaultProfiler` ships as the only concrete implementation — it is the baseline that all
-future profilers improve upon for their specific format.
+`DefaultProfiler` and `PdfProfiler` ship as the only concrete implementations.
 
 ---
 
@@ -16,12 +14,6 @@ future profilers improve upon for their specific format.
 
 - **Input:** `bytes` — raw file content
 - **Output:** `DocumentProfile` — dataclass carrying document-level and page-level structural metadata
-
----
-
-## `FileType` Enum
-
-Centralises all supported MIME types. Used throughout the module to avoid raw strings.
 
 ---
 
@@ -64,26 +56,17 @@ Top-level output of the profiler.
 
 ---
 
-## Language Detection
+## Detection
 
-Language detection is injected as a dependency — the profiler does not hardcode any
-detection strategy.
-
-### `LanguageDetector` ABC
-
-Defined in `libs/language/base.py`.
+Detection concerns are handled by an injected `Detector` instance. The profiler does not
+hardcode any detection strategy.
 
 | Method | Signature | Description |
 |---|---|---|
-| `detect` | `(text: str) -> str` | Returns a locale code (e.g. `"en"`, `"fr"`). Never raises. |
+| `detect_language` | `(text: str) -> str` | Returns a locale code (e.g. `"en"`, `"fr"`). Never raises. |
+| `detect_mime` | `(file_bytes: bytes) -> FileType` | Returns a `FileType` resolved from magic bytes. Never raises. |
 
-### `DummyLanguageDetector`
-
-Defined in `libs/language/implementations/dummy.py`. Always returns `"en"`. Used as the
-default when no real detector is configured.
-
-Future implementations (e.g. `LinguaLanguageDetector`) are added under
-`libs/language/implementations/` without modifying any other code.
+The `Detector` is injected at construction time by the consuming project.
 
 ---
 
@@ -101,29 +84,11 @@ must explicitly declare all of the following:
 
 ---
 
-## `MimeTypeDetector` Utility
-
-Defined in `libs/profiler/detector.py`. Magic-byte inspection via `python-magic`. Returns a `FileType`. Returns
-`FileType.UNKNOWN` for unrecognised signatures — never raises.
-
-MIME detection ownership lives in this module.
-
----
-
 ## Profiler Registry
 
-A `ProfilerRegistry` is instantiated by the consuming project and receives its profiler list
-directly as a constructor argument. Language detector wiring is handled explicitly by the
-consuming project:
-
-```python
-detector = DummyLanguageDetector()
-
-registry = ProfilerRegistry(profilers=[
-    PdfProfiler(language_detector=detector),
-    DefaultProfiler(),
-])
-```
+A `ProfilerRegistry` is instantiated by the consuming project and receives its profiler
+list and a `Detector` instance directly as constructor arguments. Detector wiring is
+handled explicitly by the consuming project.
 
 **At startup**, the registry validates that no two registered profilers share the same
 `get_priority()` for the same `FileType` — raises `ProfilerPriorityConflictError`, failing
@@ -133,24 +98,23 @@ fast before any document is processed.
 
 | Step | Responsibility |
 |---|---|
-| 1. Detect MIME | Registry delegates to `MimeTypeDetector`, returns a `FileType` |
+| 1. Detect MIME | Registry calls `detector.detect_mime(file_bytes)`, returns a `FileType` |
 | 2. Filter by MIME | Registry narrows candidates to profilers whose `supported_mime_types` includes the detected `FileType` |
 | 3. `can_handle` | Each candidate performs deep inspection of `file_bytes` |
 | 4. Sort & dispatch | Registry sorts surviving candidates by `get_priority()` descending, dispatches to the winner |
 
 Raises `NoProfilerFoundError` if no candidate survives steps 2–3. Under normal operation
-this should never occur — it indicates a misconfiguration where `DefaultProfiler` was omitted
-from the registered profiler list.
+this should never occur — it indicates a misconfiguration where `DefaultProfiler` was
+omitted from the registered profiler list.
 
 ---
 
 ## `DefaultProfiler`
 
-The only concrete profiler shipped with the module. Must be explicitly registered by the
-consuming project like any other profiler. Declares all `FileType` values including
-`FileType.UNKNOWN` in `supported_mime_types`, always returns `True` from `can_handle`, and
-always declares priority `1` — ensuring it is always the last resort when no higher-priority
-profiler matches.
+Must be explicitly registered by the consuming project like any other profiler. Declares
+all `FileType` values including `FileType.UNKNOWN` in `supported_mime_types`, always
+returns `True` from `can_handle`, and always declares priority `1` — ensuring it is always
+the last resort when no higher-priority profiler matches.
 
 Returns:
 
@@ -162,7 +126,30 @@ DocumentProfile(
 )
 ```
 
-Does not require a `LanguageDetector` — no text is extracted.
+Does not require a `Detector` — no text or MIME detection is performed.
+
+---
+
+## `PdfProfiler`
+
+Profiles PDF documents using PyMuPDF. Accepts a `Detector` injected at construction time.
+
+| Attribute | Value |
+|---|---|
+| `supported_mime_types` | `[FileType.PDF]` |
+| `get_priority()` | `50` |
+| `can_handle` | Returns `False` for encrypted PDFs, `True` otherwise |
+
+Per-page profiling:
+
+| Field | Logic |
+|---|---|
+| `has_text` | Page has extractable text |
+| `has_images` | Page has embedded images |
+| `has_tables` | `page.find_tables()` returns at least one table |
+| `is_scanned` | No text but has images |
+| `layout` | `SINGLE_COLUMN` if has text, `UNKNOWN` otherwise |
+| `language` | `detector.detect_language(text)` if has text, `None` otherwise |
 
 ---
 
@@ -171,8 +158,8 @@ Does not require a `LanguageDetector` — no text is extracted.
 | Decision | Choice |
 |---|---|
 | Python | 3.12 |
-| MIME detection | `python-magic` + `libmagic` system dependency |
-| Language detection | Injected via `LanguageDetector` ABC — `DummyLanguageDetector` by default |
+| Detection | Injected via `Detector` ABC |
+| PDF profiling | `pymupdf` |
 | Testing | `pytest` + `pytest-cov` |
 | Linting / formatting | `ruff` |
 
@@ -181,67 +168,55 @@ Does not require a `LanguageDetector` — no text is extracted.
 ## Folder Structure
 
 ```
-document-ai/
-├── libs/
-│   ├── language/
-│   │   ├── __init__.py
-│   │   ├── base.py                       # LanguageDetector ABC
-│   │   └── implementations/
-│   │       ├── __init__.py
-│   │       └── dummy.py                  # DummyLanguageDetector
-│   └── profiler/
-│       ├── __init__.py
-│       ├── enums.py                      # FileType enum
-│       ├── models.py                     # DocumentProfile, PageProfile, Layout
-│       ├── base.py                       # BaseDocumentProfiler ABC
-│       ├── detector.py                   # MimeTypeDetector
-│       ├── registry.py                   # ProfilerRegistry, errors
-│       └── implementations/
-│           ├── __init__.py
-│           └── default.py                # DefaultProfiler
-└── tests/
-    └── libs/
-        ├── language/
-        │   └── implementations/
-        │       └── test_dummy.py
-        └── profiler/
-            ├── test_detector.py
-            ├── test_registry.py
-            └── implementations/
-                └── test_default.py
+libs/
+└── profiler/
+    ├── __init__.py
+    ├── base.py                           # BaseDocumentProfiler ABC
+    ├── registry.py                       # ProfilerRegistry, errors
+    └── implementations/
+        ├── __init__.py
+        ├── default.py                    # DefaultProfiler
+        └── pdf.py                        # PdfProfiler
+tests/
+└── libs/
+    └── profiler/
+        ├── test_registry.py
+        └── implementations/
+            ├── test_default.py
+            ├── test_pdf.py
+            └── test_pdf_integration.py
 ```
 
 ---
 
 ## Implementation Order
 
-1. `FileType` enum + `Layout` enum
-2. `PageProfile` + `DocumentProfile` dataclasses
-3. `LanguageDetector` ABC + `DummyLanguageDetector`
-4. `BaseDocumentProfiler` ABC
-5. `MimeTypeDetector`
-6. `ProfilerRegistry` + errors
-7. `DefaultProfiler`
-8. Tests at each stage
+1. `Layout` enum + `PageProfile` + `DocumentProfile` dataclasses (in `libs/common/`)
+2. `BaseDocumentProfiler` ABC
+3. `ProfilerRegistry` + errors
+4. `DefaultProfiler`
+5. `PdfProfiler`
+6. Tests at each stage
 
 ---
 
 ## Acceptance Criteria
 
-- [ ] `FileType` enum defined with all supported MIME types plus `FileType.UNKNOWN`
 - [ ] `Layout` enum defined with `SINGLE_COLUMN`, `MULTI_COLUMN`, `MIXED`, `UNKNOWN`
 - [ ] `PageProfile` dataclass defined with: `page_number`, `has_text`, `has_images`, `has_tables`, `is_scanned`, `layout`, `language`
 - [ ] `DocumentProfile` dataclass defined with: `mime_type`, `page_count`, `pages`
-- [ ] `LanguageDetector` ABC defined with single abstract method `detect(text: str) -> str`
-- [ ] `DummyLanguageDetector` always returns `"en"`, never raises
 - [ ] `BaseDocumentProfiler` ABC defined with no defaults: `supported_mime_types`, `can_handle`, `get_priority`, `profile` all abstract
 - [ ] `get_priority` contract documented: valid range is 1–100, higher value wins
-- [ ] `MimeTypeDetector` implemented using `python-magic`, returns `FileType`, returns `FileType.UNKNOWN` for unrecognised signatures — never raises
-- [ ] `ProfilerRegistry` accepts profiler list as constructor argument, runs conflict detection at startup
+- [ ] `ProfilerRegistry` accepts profiler list and `Detector` as constructor arguments
+- [ ] `ProfilerRegistry` calls `detector.detect_mime` for MIME detection
 - [ ] `ProfilerPriorityConflictError` raised at startup on priority collision for the same `FileType`
 - [ ] `NoProfilerFoundError` raised at runtime when no profiler survives MIME filtering + `can_handle`; documented as a misconfiguration signal
 - [ ] `DefaultProfiler` declared with `supported_mime_types` covering all `FileType` values including `UNKNOWN`, `can_handle` always returns `True`, `get_priority` always returns `1`
 - [ ] `DefaultProfiler` returns `DocumentProfile(mime_type=FileType.UNKNOWN, page_count=0, pages=[])`
+- [ ] `DefaultProfiler` does not require a `Detector`
 - [ ] `DefaultProfiler` registered explicitly by the consuming project — no auto-registration logic in the registry
-- [ ] Language detector injected at profiler construction time by the consuming project
-- [ ] Unit tests cover: `MimeTypeDetector` correct detection and `FileType.UNKNOWN` fallback, registry conflict detection at startup, priority resolution, `can_handle` dispatch, `DefaultProfiler` as last resort, `NoProfilerFoundError` when `DefaultProfiler` is omitted, `DummyLanguageDetector` always returns `"en"`
+- [ ] `PdfProfiler` accepts `Detector` at construction time
+- [ ] `PdfProfiler` calls `detector.detect_language` per page
+- [ ] `PdfProfiler` returns `False` from `can_handle` for encrypted PDFs
+- [ ] Detector injected at construction time by the consuming project
+- [ ] Unit tests cover: registry conflict detection at startup, priority resolution, `can_handle` dispatch, `DefaultProfiler` as last resort, `NoProfilerFoundError` when `DefaultProfiler` is omitted, `PdfProfiler` per-page profiling, language detection called with page text
