@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from unittest.mock import MagicMock
+from uuid import UUID
 
 import pytest
 
@@ -195,3 +196,23 @@ class TestSlidingWindowPageResolution:
         result = strategy.chunk(doc)
         assert result[0].source_reference.page_start == 1
         assert result[-1].source_reference.page_end == 3
+
+
+class TestSlidingWindowChunkIdentity:
+    def test_each_chunk_has_a_uuid(self):
+        strategy = SlidingWindowChunkingStrategy(window_size=10, overlap_ratio=0.0)
+        result = strategy.chunk(_make_single_page("a" * 100))
+        for chunk in result:
+            assert isinstance(chunk.id, UUID)
+
+    def test_each_chunk_has_unique_id(self):
+        strategy = SlidingWindowChunkingStrategy(window_size=10, overlap_ratio=0.0)
+        result = strategy.chunk(_make_single_page("a" * 100))
+        ids = [chunk.id for chunk in result]
+        assert len(ids) == len(set(ids))
+
+    def test_document_id_defaults_to_none(self):
+        strategy = SlidingWindowChunkingStrategy()
+        result = strategy.chunk(_make_single_page("Some content."))
+        for chunk in result:
+            assert chunk.document_id is None

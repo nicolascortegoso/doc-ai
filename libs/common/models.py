@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from uuid import UUID, uuid4
 
 from libs.common.enums import FileType, Layout
 
@@ -61,6 +62,8 @@ class DocumentChunk:
     source_reference: SourceReference
     mime_type: FileType
     strategy: str
+    id: UUID = field(default_factory=uuid4)
+    document_id: UUID | None = None
 
 
 @dataclass
