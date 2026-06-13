@@ -31,7 +31,7 @@ class ParsedPage:
 
 
 @dataclass
-class MarkdownDocument:
+class ParsedDocument:
     mime_type: FileType
     page_count: int
     pages: list[ParsedPage] = field(default_factory=list)

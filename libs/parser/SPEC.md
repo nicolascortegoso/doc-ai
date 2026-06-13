@@ -4,7 +4,7 @@
 
 A standalone, extensible document parsing library living at `libs/parser/` inside the
 Document-AI project. Accepts raw file bytes and a `DocumentProfile` (produced by the
-profiler) and produces a structured `MarkdownDocument` dataclass. Designed around an ABC
+profiler) and produces a structured `ParsedDocument` dataclass. Designed around an ABC
 and a priority-based registry so that format-specific extraction strategies can be added
 incrementally without modifying the core module.
 
@@ -16,7 +16,7 @@ baseline that all future strategies improve upon for their specific format and p
 ## Interface Contract
 
 - **Input:** `bytes` — raw file content, `DocumentProfile` — profiler output
-- **Output:** `MarkdownDocument` — dataclass carrying per-page extracted Markdown content
+- **Output:** `ParsedDocument` — dataclass carrying per-page extracted text content
 
 ---
 
@@ -31,10 +31,10 @@ Extracted content and metadata for a single page.
 | Field | Type | Description |
 |---|---|---|
 | `page_number` | `int` | 1-based page number |
-| `content` | `str` | Extracted Markdown content for this page |
+| `content` | `str` | Extracted text content for this page |
 | `strategy` | `str` | Class name of the strategy that produced this page |
 
-### `MarkdownDocument` Dataclass
+### `ParsedDocument` Dataclass
 
 Top-level output of the parser.
 
@@ -46,11 +46,12 @@ Top-level output of the parser.
 
 #### `to_markdown() -> str`
 
+A utility method for debugging and/or storage purposes — not part of the pipeline.
 Assembles the full document as a single Markdown string. Every page emits a
 `<!-- page N -->` delimiter followed by its content, joined by `\n\n`. Empty pages
 still emit their delimiter — page numbers remain consistent with the `DocumentProfile`.
 
-```python
+```
 doc.to_markdown()
 # <!-- page 1 -->
 # Page one content.
@@ -95,7 +96,7 @@ must explicitly declare all of the following:
 | `supported_mime_types` | `ClassVar[list[FileType]]` | Declares which file types this strategy handles. Used for startup conflict detection and MIME filtering |
 | `can_handle` | `(page_profile: PageProfile) -> bool` | Deep inspection of page profile (e.g. has text, not scanned). Called only after MIME filtering |
 | `get_priority` | `() -> int` | Returns an integer priority between 1 and 100 (higher = higher priority). `DefaultPageExtractionStrategy` always declares `1` |
-| `extract` | `(file_bytes: bytes, page_profile: PageProfile) -> str` | Extracts Markdown content for the page. Returns empty string if no content can be extracted |
+| `extract` | `(file_bytes: bytes, page_profile: PageProfile) -> str` | Extracts text content for the page. Returns empty string if no content can be extracted |
 
 ---
 
@@ -173,16 +174,13 @@ before being returned.
 
 ## Folder Structure
 
-## Folder Structure
-
-
 ```
 document-ai/
 ├── libs/
 │   ├── common/
 │   │   ├── __init__.py
 │   │   ├── enums.py                          # FileType, Layout
-│   │   └── models.py                         # PageProfile, DocumentProfile, ParsedPage, MarkdownDocument
+│   │   └── models.py                         # PageProfile, DocumentProfile, ParsedPage, ParsedDocument
 │   ├── text/
 │   │   ├── __init__.py
 │   │   ├── base.py                           # TextCleaner ABC
@@ -214,7 +212,7 @@ document-ai/
 
 ## Implementation Order
 
-1. `ParsedPage` + `MarkdownDocument` (added to `libs/common/models.py`)
+1. `ParsedPage` + `ParsedDocument` (added to `libs/common/models.py`)
 2. `TextCleaner` ABC + `PassthroughTextCleaner`
 3. `BasePageExtractionStrategy` ABC
 4. `ParserRegistry` + errors
@@ -227,10 +225,11 @@ document-ai/
 ## Acceptance Criteria
 
 - [ ] `ParsedPage` dataclass defined with: `page_number`, `content`, `strategy`
-- [ ] `MarkdownDocument` dataclass defined with: `mime_type`, `page_count`, `pages`
-- [ ] `MarkdownDocument.to_markdown()` assembles full Markdown with `<!-- page N -->` delimiters joined by `\n\n`
-- [ ] `MarkdownDocument.to_markdown()` emits delimiter for every page including empty ones
-- [ ] `MarkdownDocument.to_markdown()` returns empty string for document with no pages
+- [ ] `ParsedDocument` dataclass defined with: `mime_type`, `page_count`, `pages`
+- [ ] `ParsedDocument.to_markdown()` available as a utility method for debugging and storage
+- [ ] `ParsedDocument.to_markdown()` assembles full content with `<!-- page N -->` delimiters joined by `\n\n`
+- [ ] `ParsedDocument.to_markdown()` emits delimiter for every page including empty ones
+- [ ] `ParsedDocument.to_markdown()` returns empty string for document with no pages
 - [ ] `TextCleaner` ABC defined with single abstract method `clean(text: str) -> str`
 - [ ] `PassthroughTextCleaner` returns text unchanged, never raises
 - [ ] `BasePageExtractionStrategy` ABC defined with no defaults: `supported_mime_types`, `can_handle`, `get_priority`, `extract` all abstract

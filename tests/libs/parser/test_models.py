@@ -1,7 +1,7 @@
 import pytest
 
 from libs.common.enums import FileType
-from libs.common.models import MarkdownDocument, ParsedPage
+from libs.common.models import ParsedDocument, ParsedPage
 
 
 def _make_parsed_page(page_number: int, content: str = "") -> ParsedPage:
@@ -14,7 +14,7 @@ def _make_parsed_page(page_number: int, content: str = "") -> ParsedPage:
 
 class TestMarkdownDocument:
     def test_to_markdown_single_page_with_content(self):
-        doc = MarkdownDocument(
+        doc = ParsedDocument(
             mime_type=FileType.PDF,
             page_count=1,
             pages=[_make_parsed_page(1, "# Hello\n\nSome text.")],
@@ -22,7 +22,7 @@ class TestMarkdownDocument:
         assert doc.to_markdown() == "<!-- page 1 -->\n# Hello\n\nSome text."
 
     def test_to_markdown_multiple_pages(self):
-        doc = MarkdownDocument(
+        doc = ParsedDocument(
             mime_type=FileType.PDF,
             page_count=3,
             pages=[
@@ -37,7 +37,7 @@ class TestMarkdownDocument:
         assert "<!-- page 3 -->\nPage three." in result
 
     def test_to_markdown_pages_joined_by_double_newline(self):
-        doc = MarkdownDocument(
+        doc = ParsedDocument(
             mime_type=FileType.PDF,
             page_count=2,
             pages=[
@@ -48,7 +48,7 @@ class TestMarkdownDocument:
         assert doc.to_markdown() == "<!-- page 1 -->\nFirst.\n\n<!-- page 2 -->\nSecond."
 
     def test_to_markdown_empty_page_still_emits_delimiter(self):
-        doc = MarkdownDocument(
+        doc = ParsedDocument(
             mime_type=FileType.PDF,
             page_count=2,
             pages=[
@@ -60,7 +60,7 @@ class TestMarkdownDocument:
         assert "<!-- page 2 -->" in result
 
     def test_to_markdown_all_empty_pages_still_emit_delimiters(self):
-        doc = MarkdownDocument(
+        doc = ParsedDocument(
             mime_type=FileType.PDF,
             page_count=2,
             pages=[_make_parsed_page(1, ""), _make_parsed_page(2, "")],
@@ -70,5 +70,5 @@ class TestMarkdownDocument:
         assert "<!-- page 2 -->" in result
 
     def test_to_markdown_empty_pages_list(self):
-        doc = MarkdownDocument(mime_type=FileType.PDF, page_count=0, pages=[])
+        doc = ParsedDocument(mime_type=FileType.PDF, page_count=0, pages=[])
         assert doc.to_markdown() == ""

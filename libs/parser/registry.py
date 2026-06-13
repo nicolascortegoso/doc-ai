@@ -1,5 +1,5 @@
 from libs.common.enums import FileType
-from libs.common.models import DocumentProfile, MarkdownDocument, ParsedPage
+from libs.common.models import DocumentProfile, ParsedDocument, ParsedPage
 from libs.parser.base import BasePageExtractionStrategy
 
 
@@ -54,12 +54,12 @@ class ParserRegistry:
                     )
                 seen[key] = type(strategy)
 
-    def parse(self, file_bytes: bytes, profile: DocumentProfile) -> MarkdownDocument:
+    def parse(self, file_bytes: bytes, profile: DocumentProfile) -> ParsedDocument:
         parsed_pages = [
             self._parse_page(file_bytes, page_profile, profile.mime_type)
             for page_profile in profile.pages
         ]
-        return MarkdownDocument(
+        return ParsedDocument(
             mime_type=profile.mime_type,
             page_count=profile.page_count,
             pages=parsed_pages,
