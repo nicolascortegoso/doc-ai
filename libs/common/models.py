@@ -37,12 +37,27 @@ class ParsedDocument:
     pages: list[ParsedPage] = field(default_factory=list)
 
     def to_markdown(self) -> str:
-        """Assemble full Markdown content with page delimiters.
+        """Utility method for debugging and storage purposes.
 
-        Every page is included regardless of whether its content is empty,
-        keeping page numbers consistent with the DocumentProfile.
+        Assembles the full document as a single Markdown string with
+        <!-- page N --> delimiters joined by double newlines. Not part
+        of the pipeline — the chunker operates directly on pages.
         """
         parts = []
         for page in self.pages:
             parts.append(f"<!-- page {page.page_number} -->\n{page.content}")
         return "\n\n".join(parts)
+
+
+@dataclass
+class SourceReference:
+    page_start: int
+    page_end: int
+
+
+@dataclass
+class DocumentChunk:
+    content: str
+    source_reference: SourceReference
+    mime_type: FileType
+    strategy: str
