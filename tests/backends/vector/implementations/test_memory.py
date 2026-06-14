@@ -6,6 +6,7 @@ import pytest
 
 from libs.common.enums import FileType
 from libs.common.models import DocumentChunk, SourceReference
+from backends.vector.models import SearchResult
 from backends.vector.implementations.memory import InMemoryVectorStore
 
 
@@ -126,3 +127,13 @@ class TestInMemoryVectorStoreExists:
         store.upsert(chunk, [1.0, 0.0])
         store.delete(chunk.id)
         assert store.exists(chunk.id) is False
+
+
+class TestInMemoryVectorStoreDocumentId:
+    def test_document_id_preserved_through_upsert_and_search(self, store):
+        doc_id = uuid4()
+        chunk = _make_chunk()
+        chunk.document_id = doc_id
+        store.upsert(chunk, [1.0, 0.0])
+        results = store.search([1.0, 0.0], top_k=1)
+        assert results[0].chunk.document_id == doc_id

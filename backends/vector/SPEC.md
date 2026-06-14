@@ -54,6 +54,7 @@ assumptions about the metric used.
 Defined in `backends/vector/implementations/memory.py`. Stores chunks and
 embeddings in Python dicts. Uses brute-force cosine similarity for search.
 Not thread-safe. Suitable for testing and local development only.
+Filters are ignored — no filtering is performed in this implementation.
 
 ---
 
@@ -93,19 +94,16 @@ tests/
 
 ## Implementation Order
 
-1. Update `DocumentChunk` in `libs/common/models.py` — add `id: UUID` and `document_id: UUID | None`
-2. `SearchResult` dataclass
-3. `VectorStore` ABC
-4. `InMemoryVectorStore`
-5. Tests at each stage
+1. `SearchResult` dataclass
+2. `VectorStore` ABC
+3. `InMemoryVectorStore`
+4. Tests
 
 ---
 
 ## Acceptance Criteria
 
-- [ ] `DocumentChunk` updated with `id: UUID` defaulting to `uuid4()`
-- [ ] `DocumentChunk` updated with `document_id: UUID | None` defaulting to `None`
-- [ ] `SearchResult` dataclass defined with: `chunk`, `score`
+- [ ] `SearchResult` dataclass defined in `backends/vector/models.py` with: `chunk`, `score`
 - [ ] `VectorStore` ABC defined with: `upsert`, `search`, `delete`, `exists`
 - [ ] `search` accepts optional `filters: dict | None` parameter
 - [ ] `delete` is a no-op when chunk does not exist
@@ -113,7 +111,8 @@ tests/
 - [ ] `InMemoryVectorStore.search` returns results sorted by score descending
 - [ ] `InMemoryVectorStore.search` respects `top_k` limit
 - [ ] `InMemoryVectorStore.search` uses cosine similarity
+- [ ] `InMemoryVectorStore.search` ignores `filters`
 - [ ] `InMemoryVectorStore.delete` removes chunk and embedding
 - [ ] `InMemoryVectorStore.exists` returns correct boolean
-- [ ] `InMemoryVectorStore` ignores `filters` — no filtering in the in-memory implementation
-- [ ] Unit tests cover: upsert and search, top_k limit, score ordering, delete removes chunk, exists returns correct boolean, search on empty store returns empty list
+- [ ] `document_id` preserved through upsert and search
+- [ ] Unit tests cover: upsert and search, top_k limit, score ordering, delete removes chunk, exists returns correct boolean, search on empty store returns empty list, document_id preserved
