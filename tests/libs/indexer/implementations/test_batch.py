@@ -4,10 +4,10 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from libs.common.enums import FileType
-from libs.common.models import DocumentChunk, IndexedChunk, SourceReference
-from libs.embedder.base import Embedder
-from libs.embedder.implementations.random import RandomEmbedder
+from common.enums import FileType
+from common.models import DocumentChunk, IndexedChunk, SourceReference
+from libs.indexer.embedder.base import Embedder
+from libs.indexer.embedder.implementations.random import RandomEmbedder
 from libs.indexer.implementations.batch import BatchIndexer
 
 

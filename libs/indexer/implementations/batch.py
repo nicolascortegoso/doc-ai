@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from typing import ClassVar
 
-from libs.common.enums import FileType
-from libs.common.models import DocumentChunk, IndexedChunk
-from libs.embedder.base import Embedder
-from libs.embedder.implementations.random import RandomEmbedder
+from common.enums import FileType
+from common.models import DocumentChunk, IndexedChunk
+from libs.indexer.embedder.base import Embedder
+from libs.indexer.embedder.implementations.random import RandomEmbedder
 from libs.indexer.base import BaseIndexingStrategy
 
 

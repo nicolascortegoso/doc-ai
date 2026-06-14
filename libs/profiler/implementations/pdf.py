@@ -2,10 +2,10 @@ from typing import ClassVar
 
 import fitz  # PyMuPDF
 
-from libs.common.enums import FileType, Layout
-from libs.common.models import DocumentProfile, PageProfile
-from libs.detector.base import Detector
-from libs.detector.implementations.default import DefaultDetector
+from common.enums import FileType, Layout
+from common.models import DocumentProfile, PageProfile
+from libs.profiler.detector.base import Detector
+from libs.profiler.detector.implementations.default import DefaultDetector
 from libs.profiler.base import BaseDocumentProfiler
 
 

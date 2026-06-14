@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from typing import ClassVar
 
-from libs.common.enums import FileType
-from libs.common.models import DocumentChunk, DocumentTree, TreeNode
+from common.enums import FileType
+from common.models import DocumentChunk, DocumentTree, TreeNode
 from libs.merger.base import BaseMergingStrategy
-from libs.reducer.base import Reducer
-from libs.reducer.implementations.truncating import TruncatingReducer
-from libs.reducer.models import ReducerInput
+from libs.merger.reducer.base import Reducer
+from libs.merger.reducer.implementations.truncating import TruncatingReducer
+from libs.merger.reducer.models import ReducerInput
 
 
 class BottomUpMergingStrategy(BaseMergingStrategy):

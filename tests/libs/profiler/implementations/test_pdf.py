@@ -6,9 +6,9 @@ from unittest.mock import MagicMock
 import fitz
 import pytest
 
-from libs.common.enums import FileType, Layout
-from libs.detector.base import Detector
-from libs.detector.implementations.default import DefaultDetector
+from common.enums import FileType, Layout
+from libs.profiler.detector.base import Detector
+from libs.profiler.detector.implementations.default import DefaultDetector
 from libs.profiler.implementations.pdf import PdfProfiler
 
 

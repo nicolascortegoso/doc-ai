@@ -6,11 +6,11 @@ from unittest.mock import MagicMock
 import fitz
 import pytest
 
-from libs.common.enums import FileType, Layout
-from libs.common.models import PageProfile
+from common.enums import FileType, Layout
+from common.models import PageProfile
 from libs.parser.implementations.plain_pdf import PlainPdfExtractionStrategy
-from libs.postprocessor.base import Postprocessor
-from libs.postprocessor.implementations.passthrough import PassthroughPostprocessor
+from libs.parser.postprocessor.base import Postprocessor
+from libs.parser.postprocessor.implementations.passthrough import PassthroughPostprocessor
 
 
 def _make_page_profile(

@@ -1,7 +1,7 @@
 from typing import ClassVar
 
-from libs.common.enums import FileType
-from libs.common.models import DocumentProfile
+from common.enums import FileType
+from common.models import DocumentProfile
 from libs.profiler.base import BaseDocumentProfiler
 
 

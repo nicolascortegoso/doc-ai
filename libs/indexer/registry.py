@@ -1,5 +1,5 @@
-from libs.common.enums import FileType
-from libs.common.models import DocumentChunk, IndexedChunk
+from common.enums import FileType
+from common.models import DocumentChunk, IndexedChunk
 from libs.indexer.base import BaseIndexingStrategy
 
 

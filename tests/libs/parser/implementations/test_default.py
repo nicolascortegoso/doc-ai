@@ -1,7 +1,7 @@
 import pytest
 
-from libs.common.enums import FileType, Layout
-from libs.common.models import PageProfile
+from common.enums import FileType, Layout
+from common.models import PageProfile
 from libs.parser.implementations.default import DefaultPageExtractionStrategy
 
 

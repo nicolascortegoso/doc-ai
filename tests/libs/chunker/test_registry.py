@@ -1,7 +1,7 @@
 import pytest
 
-from libs.common.enums import FileType
-from libs.common.models import DocumentChunk, ParsedDocument, ParsedPage, SourceReference
+from common.enums import FileType
+from common.models import DocumentChunk, ParsedDocument, ParsedPage, SourceReference
 from libs.chunker.base import BaseChunkingStrategy
 from libs.chunker.implementations.sliding_window import SlidingWindowChunkingStrategy
 from libs.chunker.registry import (

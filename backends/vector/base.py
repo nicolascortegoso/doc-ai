@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from uuid import UUID
 
-from libs.common.models import DocumentChunk
+from common.models import DocumentChunk
 from backends.vector.models import SearchResult
 
 

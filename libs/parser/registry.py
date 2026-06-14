@@ -1,5 +1,5 @@
-from libs.common.enums import FileType
-from libs.common.models import DocumentProfile, ParsedDocument, ParsedPage
+from common.enums import FileType
+from common.models import DocumentProfile, ParsedDocument, ParsedPage
 from libs.parser.base import BasePageExtractionStrategy
 
 

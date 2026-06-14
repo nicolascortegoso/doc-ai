@@ -1,7 +1,7 @@
 from typing import ClassVar
 
-from libs.common.enums import FileType
-from libs.common.models import PageProfile
+from common.enums import FileType
+from common.models import PageProfile
 from libs.parser.base import BasePageExtractionStrategy
 
 

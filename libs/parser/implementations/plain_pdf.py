@@ -2,11 +2,11 @@ from typing import ClassVar
 
 import fitz  # PyMuPDF
 
-from libs.common.enums import FileType
-from libs.common.models import PageProfile
+from common.enums import FileType
+from common.models import PageProfile
 from libs.parser.base import BasePageExtractionStrategy
-from libs.postprocessor.base import Postprocessor
-from libs.postprocessor.implementations.passthrough import PassthroughPostprocessor
+from libs.parser.postprocessor.base import Postprocessor
+from libs.parser.postprocessor.implementations.passthrough import PassthroughPostprocessor
 
 
 class PlainPdfExtractionStrategy(BasePageExtractionStrategy):

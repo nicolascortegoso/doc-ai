@@ -1,7 +1,7 @@
 import pytest
 
-from libs.common.enums import FileType
-from libs.common.models import DocumentChunk, IndexedChunk, SourceReference
+from common.enums import FileType
+from common.models import DocumentChunk, IndexedChunk, SourceReference
 from libs.indexer.base import BaseIndexingStrategy
 from libs.indexer.implementations.batch import BatchIndexer
 from libs.indexer.registry import (

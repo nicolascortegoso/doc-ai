@@ -1,5 +1,5 @@
-from libs.common.enums import FileType
-from libs.common.models import DocumentChunk, ParsedDocument
+from common.enums import FileType
+from common.models import DocumentChunk, ParsedDocument
 from libs.chunker.base import BaseChunkingStrategy
 
 

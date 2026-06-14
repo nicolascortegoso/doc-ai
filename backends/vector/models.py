@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from libs.common.models import DocumentChunk
+from common.models import DocumentChunk
 
 
 @dataclass

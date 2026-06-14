@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from uuid import UUID
 
-from libs.common.models import DocumentTree, TreeNode
+from common.models import DocumentTree, TreeNode
 from backends.graph.base import GraphStore
 
 

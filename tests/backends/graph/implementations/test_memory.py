@@ -4,8 +4,8 @@ from uuid import uuid4
 
 import pytest
 
-from libs.common.enums import FileType
-from libs.common.models import DocumentChunk, DocumentTree, SourceReference, TreeNode
+from common.enums import FileType
+from common.models import DocumentChunk, DocumentTree, SourceReference, TreeNode
 from backends.graph.implementations.memory import InMemoryGraphStore
 
 

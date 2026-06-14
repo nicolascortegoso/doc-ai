@@ -4,12 +4,12 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from libs.common.enums import FileType
-from libs.common.models import DocumentChunk, SourceReference, TreeNode
+from common.enums import FileType
+from common.models import DocumentChunk, SourceReference, TreeNode
 from libs.merger.implementations.bottom_up import BottomUpMergingStrategy
-from libs.reducer.base import Reducer
-from libs.reducer.implementations.truncating import TruncatingReducer
-from libs.reducer.models import ReducerInput
+from libs.merger.reducer.base import Reducer
+from libs.merger.reducer.implementations.truncating import TruncatingReducer
+from libs.merger.reducer.models import ReducerInput
 
 
 def _make_chunk(

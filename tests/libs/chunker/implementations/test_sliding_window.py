@@ -5,11 +5,11 @@ from uuid import UUID
 
 import pytest
 
-from libs.common.enums import FileType
-from libs.common.models import ParsedDocument, ParsedPage
+from common.enums import FileType
+from common.models import ParsedDocument, ParsedPage
 from libs.chunker.implementations.sliding_window import SlidingWindowChunkingStrategy
-from libs.splitter.base import Splitter
-from libs.splitter.implementations.character import CharacterSplitter
+from libs.chunker.splitter.base import Splitter
+from libs.chunker.splitter.implementations.character import CharacterSplitter
 
 
 def _make_document(

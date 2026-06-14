@@ -8,6 +8,7 @@ The platform is built around clean abstractions and swappable backends — ident
 
 The codebase is organised into the following layers:
 
-- [`libs/`](libs/LIB_SPEC.md) — pure domain logic, stateless and injectable
-- [`backends/`](backends/BACKEND_SPEC.md) — storage abstractions
-- [`pipelines/`](pipelines/PIPELINE_SPEC.md) — orchestration layer
+- [`common/`](common/COMMON_SPEC.md) — shared domain models
+- [`libs/`](libs/LIBS_SPEC.md) — pure domain logic, stateless and injectable
+- [`backends/`](backends/BACKENDS_SPEC.md) — storage abstractions
+- [`pipelines/`](pipelines/PIPELINES_SPEC.md) — orchestration layer

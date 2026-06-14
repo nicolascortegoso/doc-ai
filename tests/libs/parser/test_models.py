@@ -1,7 +1,7 @@
 import pytest
 
-from libs.common.enums import FileType
-from libs.common.models import ParsedDocument, ParsedPage
+from common.enums import FileType
+from common.models import ParsedDocument, ParsedPage
 
 
 def _make_parsed_page(page_number: int, content: str = "") -> ParsedPage:

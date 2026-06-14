@@ -1,7 +1,7 @@
 import pytest
 
-from libs.common.enums import FileType
-from libs.common.models import DocumentChunk, DocumentTree, SourceReference, TreeNode
+from common.enums import FileType
+from common.models import DocumentChunk, DocumentTree, SourceReference, TreeNode
 from libs.merger.base import BaseMergingStrategy
 from libs.merger.implementations.bottom_up import BottomUpMergingStrategy
 from libs.merger.registry import (

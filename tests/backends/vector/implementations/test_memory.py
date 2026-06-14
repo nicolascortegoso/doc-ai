@@ -4,8 +4,8 @@ from uuid import uuid4
 
 import pytest
 
-from libs.common.enums import FileType
-from libs.common.models import DocumentChunk, SourceReference
+from common.enums import FileType
+from common.models import DocumentChunk, SourceReference
 from backends.vector.models import SearchResult
 from backends.vector.implementations.memory import InMemoryVectorStore
 

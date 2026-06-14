@@ -3,7 +3,7 @@ from __future__ import annotations
 import math
 from uuid import UUID
 
-from libs.common.models import DocumentChunk
+from common.models import DocumentChunk
 from backends.vector.base import VectorStore
 from backends.vector.models import SearchResult
 

@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from typing import ClassVar
 
-from libs.common.enums import FileType
-from libs.common.models import DocumentChunk, ParsedDocument, SourceReference
+from common.enums import FileType
+from common.models import DocumentChunk, ParsedDocument, SourceReference
 from libs.chunker.base import BaseChunkingStrategy
-from libs.splitter.base import Splitter
-from libs.splitter.implementations.character import CharacterSplitter
+from libs.chunker.splitter.base import Splitter
+from libs.chunker.splitter.implementations.character import CharacterSplitter
 
 
 class SlidingWindowChunkingStrategy(BaseChunkingStrategy):

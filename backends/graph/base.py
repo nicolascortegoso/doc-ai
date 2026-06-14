@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from uuid import UUID
 
-from libs.common.models import DocumentTree, TreeNode
+from common.models import DocumentTree, TreeNode
 
 
 class GraphStore(ABC):

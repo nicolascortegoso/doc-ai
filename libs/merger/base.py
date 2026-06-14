@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import ClassVar
 
-from libs.common.enums import FileType
-from libs.common.models import DocumentChunk, DocumentTree
+from common.enums import FileType
+from common.models import DocumentChunk, DocumentTree
 
 
 class BaseMergingStrategy(ABC):
