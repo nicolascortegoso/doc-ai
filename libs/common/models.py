@@ -78,6 +78,7 @@ class TreeNode:
     level: int
     children: list[TreeNode] = field(default_factory=list)
     chunk: DocumentChunk | None = None
+    id: UUID = field(default_factory=uuid4)
 
     @property
     def source_reference(self) -> SourceReference:
@@ -110,3 +111,4 @@ class TreeNode:
 class DocumentTree:
     root: TreeNode
     mime_type: FileType
+    document_id: UUID | None = None
