@@ -10,7 +10,7 @@ and local development. Production implementations live in `app/`.
 
 ## Rules
 
-- No imports from `pipelines/` or `app/`
+- No imports from `pipelines/`
 - May import domain models from `libs/common/` — they are passed in by the consuming layer
 - `libs/` modules NEVER import from `backends/`
 - Every module ships an `InMemory*` implementation — not thread-safe, for testing only

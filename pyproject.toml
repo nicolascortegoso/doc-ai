@@ -3,7 +3,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "document-ai-profiler"
+name = "document-ai"
 version = "0.1.0"
 requires-python = ">=3.12"
 dependencies = [
@@ -20,7 +20,7 @@ dev = [
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["libs*", "backends*"]
+include = ["common*", "libs*", "backends*", "pipelines*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -34,5 +34,5 @@ line-length = 100
 select = ["E", "F", "I", "UP"]
 
 [tool.coverage.run]
-source = ["libs", "backends"]
+source = ["common", "libs", "backends", "pipelines"]
 omit = ["tests/*"]
