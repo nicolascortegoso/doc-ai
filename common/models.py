@@ -112,3 +112,12 @@ class DocumentTree:
     root: TreeNode
     mime_type: FileType
     document_id: UUID | None = None
+
+
+@dataclass
+class GlossaryEntry:
+    term: str
+    slug: str
+    definition: str
+    evidence: str
+    document_id: UUID

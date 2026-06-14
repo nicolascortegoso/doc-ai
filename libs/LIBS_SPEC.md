@@ -50,3 +50,4 @@ All domain models live in `common/`. No `libs/` module defines domain models.
 | `chunker/` | `chunker/splitter/` | [CHUNKER_SPEC.md](chunker/CHUNKER_SPEC.md) |
 | `merger/` | `merger/reducer/` | [MERGER_SPEC.md](merger/MERGER_SPEC.md) |
 | `indexer/` | `indexer/embedder/` | [INDEXER_SPEC.md](indexer/INDEXER_SPEC.md) |
+| `distiller/` | `distiller/analyzer/` + `distiller/composer/` | [DISTILLER_SPEC.md](distiller/DISTILLER_SPEC.md) |
