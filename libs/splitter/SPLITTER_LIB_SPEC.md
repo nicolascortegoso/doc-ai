@@ -1,5 +1,7 @@
 # Splitter Module
 
+[← README](../README.md)
+
 ## Overview
 
 Provides a `Splitter` ABC for text split-point determination. Designed for dependency
