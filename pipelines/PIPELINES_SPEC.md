@@ -11,8 +11,7 @@ etc.) live in the infrastructure layer.
 ## Rules
 
 - No imports from the infrastructure layer or any framework
-- May import from `libs/` and `backends/`
-- May import from `common/`
+- May import from `common/`, `libs/` and `backends/`
 - Defines stage contracts, not execution strategies
 - Every pipeline is fully resumable via `IngestionStatus`
 
@@ -48,4 +47,3 @@ tests/
 | Pipeline | Spec |
 |---|---|
 | `ingestion/` | [INGESTION_PIPELINE_SPEC.md](ingestion/INGESTION_PIPELINE_SPEC.md) |
-| `inference/` | _(coming soon)_ |

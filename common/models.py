@@ -121,3 +121,17 @@ class GlossaryEntry:
     definition: str
     evidence: str
     document_id: UUID
+
+
+@dataclass
+class Message:
+    role: str
+    content: str
+
+
+@dataclass
+class AgentResponse:
+    message: str
+    sources: list[DocumentChunk]
+    reasoning: str
+    session_id: UUID

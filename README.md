@@ -12,3 +12,4 @@ The codebase is organised into the following layers:
 - [`libs/`](libs/LIBS_SPEC.md) — pure domain logic, stateless and injectable
 - [`backends/`](backends/BACKENDS_SPEC.md) — storage abstractions
 - [`pipelines/`](pipelines/PIPELINES_SPEC.md) — orchestration layer
+- [`agent/`](agent/AGENT_SPEC.md) — conversational agent abstractions
