@@ -67,6 +67,12 @@ class DocumentChunk:
 
 
 @dataclass
+class IndexedChunk:
+    chunk: DocumentChunk
+    embedding: list[float]
+
+
+@dataclass
 class TreeNode:
     content: str
     level: int
