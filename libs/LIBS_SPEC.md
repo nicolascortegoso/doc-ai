@@ -22,10 +22,14 @@ Every module follows the same structure:
 
 ```
 libs/<module>/
-    base.py              # ABC
-    registry.py          # Priority-based dispatch (where applicable)
+    base.py                  # ABC
+    registry.py              # Priority-based dispatch (where applicable)
     implementations/
-        default.py       # Default implementation
+        default.py           # Default implementation
+    <injected_dependency>/   # Injection ABC + default, nested inside consuming module
+        base.py
+        implementations/
+            default.py
 ```
 
 ## External Dependencies
@@ -35,15 +39,14 @@ All other external dependencies are injected, never hardcoded.
 
 ## Shared Models
 
-All domain models live in `libs/common/`. No other `libs/` module defines
-domain models.
+All domain models live in `common/`. No `libs/` module defines domain models.
 
 ## Module Specs
 
-| Module | Spec |
-|---|---|
-| `profiler/` | [PROFILER_SPEC.md](profiler/PROFILER_SPEC.md) |
-| `parser/` | [PARSER_SPEC.md](parser/PARSER_SPEC.md) |
-| `chunker/` | [CHUNKER_SPEC.md](chunker/CHUNKER_SPEC.md) |
-| `merger/` | [MERGER_SPEC.md](merger/MERGER_SPEC.md) |
-| `indexer/` | [INDEXER_SPEC.md](indexer/INDEXER_SPEC.md) |
+| Module | Injected Dependency | Spec |
+|---|---|---|
+| `profiler/` | `profiler/detector/` | [PROFILER_SPEC.md](profiler/PROFILER_SPEC.md) |
+| `parser/` | `parser/postprocessor/` | [PARSER_SPEC.md](parser/PARSER_SPEC.md) |
+| `chunker/` | `chunker/splitter/` | [CHUNKER_SPEC.md](chunker/CHUNKER_SPEC.md) |
+| `merger/` | `merger/reducer/` | [MERGER_SPEC.md](merger/MERGER_SPEC.md) |
+| `indexer/` | `indexer/embedder/` | [INDEXER_SPEC.md](indexer/INDEXER_SPEC.md) |

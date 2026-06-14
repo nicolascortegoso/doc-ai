@@ -1,3 +1,5 @@
+[← BACKENDS_SPEC](../BACKENDS_SPEC.md)
+
 # Graph Backend
 
 ## Overview
@@ -15,7 +17,7 @@ any specific graph store implementation.
 
 ## Data Model Updates
 
-The following fields are added to existing models in `libs/common/models.py`:
+The following fields are added to existing models in `common/models.py`:
 
 ### `TreeNode`
 
@@ -78,7 +80,7 @@ backends/
         ├── __init__.py
         └── memory.py                 # InMemoryGraphStore
 tests/
-└── backends/
+└── test_backends/
     └── graph/
         ├── __init__.py
         └── implementations/
@@ -90,8 +92,8 @@ tests/
 
 ## Implementation Order
 
-1. Update `TreeNode` in `libs/common/models.py` — add `id: UUID`
-2. Update `DocumentTree` in `libs/common/models.py` — add `document_id: UUID | None`
+1. Update `TreeNode` in `common/models.py` — add `id: UUID`
+2. Update `DocumentTree` in `common/models.py` — add `document_id: UUID | None`
 3. `GraphStore` ABC
 4. `InMemoryGraphStore`
 5. Tests

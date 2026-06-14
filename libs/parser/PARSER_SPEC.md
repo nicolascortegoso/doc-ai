@@ -108,8 +108,6 @@ delimiters joined by `\n\n`.
 | Decision | Choice |
 |---|---|
 | Python | 3.12 |
-| PDF text extraction | `pymupdf` |
-| Post-processing | Injected via `Postprocessor` ABC |
 | Testing | `pytest` + `pytest-cov` |
 | Linting / formatting | `ruff` |
 
@@ -134,7 +132,7 @@ libs/
         ├── default.py                    # DefaultPageExtractionStrategy
         └── plain_pdf.py                  # PlainPdfExtractionStrategy
 tests/
-└── libs/
+└── test_libs/
     └── parser/
         ├── test_models.py
         ├── test_registry.py

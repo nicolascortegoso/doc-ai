@@ -132,7 +132,7 @@ libs/
         ├── __init__.py
         └── bottom_up.py                  # BottomUpMergingStrategy
 tests/
-└── libs/
+└── test_libs/
     └── merger/
         ├── test_registry.py
         ├── reducer/

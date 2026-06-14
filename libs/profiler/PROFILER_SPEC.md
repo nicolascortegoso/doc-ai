@@ -119,8 +119,6 @@ Per-page profiling:
 | Decision | Choice |
 |---|---|
 | Python | 3.12 |
-| Detection | Injected via `Detector` ABC |
-| PDF profiling | `pymupdf` |
 | Testing | `pytest` + `pytest-cov` |
 | Linting / formatting | `ruff` |
 
@@ -145,7 +143,7 @@ libs/
         ├── default.py                    # DefaultProfiler
         └── pdf.py                        # PdfProfiler
 tests/
-└── libs/
+└── test_libs/
     └── profiler/
         ├── test_registry.py
         ├── detector/

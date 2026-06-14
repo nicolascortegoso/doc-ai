@@ -60,7 +60,7 @@ libs/
             ├── __init__.py
             └── random.py                 # RandomEmbedder
 tests/
-└── libs/
+└── test_libs/
     └── indexer/
         └── embedder/
             └── implementations/

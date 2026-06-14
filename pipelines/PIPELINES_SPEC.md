@@ -6,12 +6,13 @@
 
 `pipelines/` contains orchestration abstractions. Every module defines an ABC
 for a specific pipeline concern. Concrete implementations (Celery, synchronous,
-etc.) live in `infrastructure/`.
+etc.) live in the infrastructure layer.
 
 ## Rules
 
-- No imports from `infrastructure/` or any framework
+- No imports from the infrastructure layer or any framework
 - May import from `libs/` and `backends/`
+- May import from `common/`
 - Defines stage contracts, not execution strategies
 - Every pipeline is fully resumable via `IngestionStatus`
 
@@ -20,41 +21,31 @@ etc.) live in `infrastructure/`.
 ```
 pipelines/<pipeline>/
     base.py              # Pipeline ABC
+    serializers.py       # Pipeline output serialisers (where needed)
     models.py            # Pipeline-specific models (where needed)
 ```
 
 ## Dependency Direction
 
 ```
-pipelines/ → libs/ + backends/
+pipelines/ → common/ + libs/ + backends/
 ```
 
-## `IngestionPipeline`
+## Testing Convention
 
-Defined in `pipelines/ingestion/base.py`.
+Test directories are prefixed with `test_` to avoid shadowing top-level package names:
 
-Orchestrates document ingestion from raw bytes to fully indexed state.
-Defines individual stage methods and a `run()` method that calls them
-in order.
-
-| Method | Description |
-|---|---|
-| `profile(document_id: UUID) -> None` | Run profiler stage |
-| `parse(document_id: UUID) -> None` | Run parser stage |
-| `chunk(document_id: UUID) -> None` | Run chunker stage |
-| `merge(document_id: UUID) -> None` | Run merger stage |
-| `index(document_id: UUID) -> None` | Run indexer stage |
-| `run(document_id: UUID) -> None` | Run all stages in order |
-
-Each stage method:
-- Reads its input from `RecordStore` / `BlobStore`
-- Runs the corresponding `libs/` pipeline stage
-- Writes its output to `BlobStore` / `VectorStore` / `GraphStore`
-- Updates `IngestionStatus` in `RecordStore`
+```
+tests/
+└── test_pipelines/
+    └── ingestion/
+        ├── test_base.py
+        └── test_serializers.py
+```
 
 ## Pipeline Specs
 
 | Pipeline | Spec |
 |---|---|
-| `ingestion/` | _(coming soon)_ |
+| `ingestion/` | [INGESTION_PIPELINE_SPEC.md](ingestion/INGESTION_PIPELINE_SPEC.md) |
 | `inference/` | _(coming soon)_ |

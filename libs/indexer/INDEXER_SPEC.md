@@ -127,7 +127,7 @@ libs/
         ├── __init__.py
         └── batch.py                      # BatchIndexer
 tests/
-└── libs/
+└── test_libs/
     └── indexer/
         ├── test_registry.py
         ├── embedder/

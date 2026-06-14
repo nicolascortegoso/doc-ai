@@ -73,7 +73,7 @@ libs/
             ├── __init__.py
             └── truncating.py             # TruncatingReducer
 tests/
-└── libs/
+└── test_libs/
     └── merger/
         └── reducer/
             ├── test_models.py

@@ -54,7 +54,7 @@ libs/
             ├── __init__.py
             └── passthrough.py            # PassthroughPostprocessor
 tests/
-└── libs/
+└── test_libs/
     └── parser/
         └── postprocessor/
             └── implementations/

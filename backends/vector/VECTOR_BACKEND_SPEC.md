@@ -1,3 +1,5 @@
+[← BACKENDS_SPEC](../BACKENDS_SPEC.md)
+
 # Vector Backend
 
 ## Overview
@@ -63,7 +65,6 @@ Filters are ignored — no filtering is performed in this implementation.
 | Decision | Choice |
 |---|---|
 | Python | 3.12 |
-| In-memory similarity | Brute-force cosine similarity |
 | Testing | `pytest` + `pytest-cov` |
 | Linting / formatting | `ruff` |
 
@@ -81,7 +82,7 @@ backends/
         ├── __init__.py
         └── memory.py                 # InMemoryVectorStore
 tests/
-└── backends/
+└── test_backends/
     └── vector/
         ├── __init__.py
         ├── test_models.py

@@ -132,7 +132,7 @@ libs/
         ├── __init__.py
         └── sliding_window.py             # SlidingWindowChunkingStrategy
 tests/
-└── libs/
+└── test_libs/
     └── chunker/
         ├── test_registry.py
         ├── splitter/

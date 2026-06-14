@@ -6,15 +6,16 @@
 
 `backends/` contains storage abstractions. Every module defines an ABC for a
 specific storage paradigm and ships an in-memory implementation for testing
-and local development. Production implementations live in `app/`.
+and local development. Concrete production implementations live in the
+infrastructure layer.
 
 ## Rules
 
 - No imports from `pipelines/`
-- May import domain models from `libs/common/` — they are passed in by the consuming layer
+- May import domain models from `common/` — they are passed in by the consuming layer
 - `libs/` modules NEVER import from `backends/`
 - Every module ships an `InMemory*` implementation — not thread-safe, for testing only
-- Concrete production implementations belong in `app/`
+- Concrete production implementations belong in the infrastructure layer
 
 ## Pattern
 

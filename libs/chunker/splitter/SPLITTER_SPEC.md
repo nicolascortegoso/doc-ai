@@ -54,7 +54,7 @@ libs/
             ├── __init__.py
             └── character.py              # CharacterSplitter
 tests/
-└── libs/
+└── test_libs/
     └── chunker/
         └── splitter/
             └── implementations/

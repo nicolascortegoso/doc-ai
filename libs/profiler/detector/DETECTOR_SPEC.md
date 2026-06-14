@@ -57,7 +57,7 @@ libs/
             ├── __init__.py
             └── default.py               # DefaultDetector
 tests/
-└── libs/
+└── test_libs/
     └── profiler/
         └── detector/
             └── implementations/
